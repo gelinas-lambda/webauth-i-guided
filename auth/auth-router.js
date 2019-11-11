@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const bcrypt = require('bcrypt');
 
 const Users = require('../users/users-model.js');
 
@@ -29,6 +30,22 @@ router.post('/login', (req, res) => {
     .catch(error => {
       res.status(500).json(error);
     });
+});
+
+router.post('/hash', (req, res) => {
+  // read a password from the body
+  // hash the password using bcryptjs
+  // return it to the user in an object that looks like
+  // { password: 'original passsword', hash: 'hashed password' }
+
+  let user = req.body;
+
+  const hash = bcrypt.hashSync(user.password, 12);
+
+  user.hash = hash;
+
+  res.status(200).json(user);
+
 });
 
 module.exports = router;
