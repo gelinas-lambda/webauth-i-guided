@@ -1,9 +1,15 @@
 const router = require('express').Router();
+const bcrypt = require('bcrypt');
 
 const Users = require('../users/users-model.js');
+const requiresAuth = require('../auth/requires-auth-middleware.js');
 
 router.post('/register', (req, res) => {
   let user = req.body;
+  // read a password from the body
+  // hash the password using bcryptjs
+  const hash = bcrypt.hashSync(user.password, 12);  
+  user.password = hash;
 
   Users.add(user)
     .then(saved => {
@@ -14,9 +20,8 @@ router.post('/register', (req, res) => {
     });
 });
 
-router.post('/login', (req, res) => {
-  let { username, password } = req.body;
-
+router.post('/login', requiresAuth, (req, res) => {
+  let { username } = req.headers;
   Users.findBy({ username })
     .first()
     .then(user => {
